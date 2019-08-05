@@ -1,26 +1,7 @@
-provider "azurerm" {}
-
 terraform {
-  backend "azurerm" {}
-}
-
-data "terraform_remote_state" "setup" {
-  backend = "azurerm"
-
-  config {
-    storage_account_name = "terraform${var.environment}sa"
-    container_name       = "state"
-    key                  = "global/setup/terraform.tfstate"
-  }
-}
-
-data "terraform_remote_state" "networking" {
-  backend = "azurerm"
-
-  config {
-    storage_account_name = "terraform${var.environment}sa"
-    container_name       = "state"
-    key                  = "${var.location}/networking/terraform.tfstate"
+  required_version = ">= 0.12.0"
+  required_providers {
+    azurerm = ">= 1.32.0"
   }
 }
 
@@ -58,16 +39,15 @@ resource "azurerm_application_gateway" "main" {
     capacity = "${var.capacity}"
   }
 
-  waf_configuration {
-    enabled = true
-    firewall_mode = "${var.waf_mode}"
-    rule_set_type = "OWASP"
-    rule_set_version = "3.0"
-  }
-
   gateway_ip_configuration {
     name      = "${var.name}-gateway-ip-configuration"
-    subnet_id = "${data.terraform_remote_state.networking.subnets[var.subnet]}"
+    subnet_id = var.subnet_id
+  }
+
+  frontend_ip_configuration {
+    name                 = local.frontend_ip_configuration_name
+    subnet_id = var.subnet_id
+    private_ip_address_allocation = "Dynamic"
   }
 
   frontend_port {
@@ -80,44 +60,45 @@ resource "azurerm_application_gateway" "main" {
     port = 443
   }
 
-  frontend_ip_configuration {
-    name                 = "${local.frontend_ip_configuration_name}"
-    subnet_id = "${data.terraform_remote_state.networking.subnets[var.subnet]}"
-    private_ip_address_allocation = "Dynamic"
-  }
-
   backend_address_pool {
-    name = "${local.backend_address_pool_name}"
+    name = local.backend_address_pool_name
   }
 
   backend_http_settings {
-    name                  = "${local.http_setting_name}"
+    name                  = local.http_setting_name
     cookie_based_affinity = "Disabled"
-    path         = "/path1/"
+    path         = "/ping/"
     port                  = 80
     protocol              = "Http"
     request_timeout       = 1
   }
 
   http_listener {
-    name                           = "${local.listener_name}"
-    frontend_ip_configuration_name = "${local.frontend_ip_configuration_name}"
+    name                           = local.listener_name
+    frontend_ip_configuration_name = local.frontend_ip_configuration_name
     frontend_port_name             = "${local.frontend_port_name}-80"
     protocol                       = "Http"
   }
 
   request_routing_rule {
-    name                       = "${local.request_routing_rule_name}"
+    name                       = local.request_routing_rule_name
     rule_type                  = "Basic"
-    http_listener_name         = "${local.listener_name}"
-    backend_address_pool_name  = "${local.backend_address_pool_name}"
-    backend_http_settings_name = "${local.http_setting_name}"
+    http_listener_name         = local.listener_name
+    backend_address_pool_name  = local.backend_address_pool_name
+    backend_http_settings_name = local.http_setting_name
+  }
+
+  waf_configuration {
+    enabled = true
+    firewall_mode = "${var.waf_mode}"
+    rule_set_type = "OWASP"
+    rule_set_version = "3.0"
   }
 }
 
 resource "azurerm_monitor_diagnostic_setting" "main" {
-  name                       = "appgw-log-analytics"
-  target_resource_id         = "${azurerm_application_gateway.main.id}"
+  name                       = "${var.name}-log-analytics"
+  target_resource_id         = azurerm_application_gateway.main.id
   log_analytics_workspace_id = "${data.terraform_remote_state.setup.log_resource_id}"
 
   log {
