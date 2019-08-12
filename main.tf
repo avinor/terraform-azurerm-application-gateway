@@ -19,10 +19,10 @@ locals {
 #
 
 resource "azurerm_resource_group" "main" {
-  name     = "${var.name}-appgw-rg"
-  location = "${var.location}"
+  name     = var.resource_group_name
+  location = var.location
 
-  tags = "${var.tags}"
+  tags = var.tags
 }
 
 resource "azurerm_application_gateway" "main" {
