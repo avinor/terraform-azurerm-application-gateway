@@ -6,6 +6,9 @@ terraform {
 }
 
 locals {
+  sku_name = var.waf_enabled ? "WAF_v2" : "Standard_v2"
+  sku_tier = var.waf_enabled ? "WAF_v2" : "Standard_v2"
+
   backend_address_pool_name      = "${var.name}-beap"
   frontend_port_name             = "${var.name}-feport"
   frontend_ip_configuration_name = "${var.name}-feip"
@@ -25,18 +28,37 @@ resource "azurerm_resource_group" "main" {
   tags = var.tags
 }
 
+#
+# Public IP
+#
+
+resource "azurerm_public_ip" "main" {
+  name                = "${var.name}-pip"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  allocation_method   = "Static"
+  sku                 = "Standard"
+
+  tags = var.tags
+}
+
+#
+# Application Gateway
+#
+
 resource "azurerm_application_gateway" "main" {
   name                = "${var.name}-appgw"
-  resource_group_name = "${azurerm_resource_group.main.name}"
-  location            = "${azurerm_resource_group.main.location}"
-  #http2_enabled = true
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  enable_http2        = true
+  zones = var.zones
 
-  tags = "${var.tags}"
+  tags = var.tags
 
   sku {
-    name     = "${var.sku_name}"
-    tier     = "${var.sku_tier}"
-    capacity = "${var.capacity}"
+    name     = local.sku_name
+    tier     = local.sku_tier
+    capacity = var.capacity.min
   }
 
   gateway_ip_configuration {
@@ -45,9 +67,14 @@ resource "azurerm_application_gateway" "main" {
   }
 
   frontend_ip_configuration {
-    name                 = local.frontend_ip_configuration_name
-    subnet_id = var.subnet_id
-    private_ip_address_allocation = "Dynamic"
+    name                          = "${local.frontend_ip_configuration_name}-public"
+    public_ip_address_id          = azurerm_public_ip.main.id
+  }
+
+  frontend_ip_configuration {
+    name                          = "${local.frontend_ip_configuration_name}-private"
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.private_ip_address
   }
 
   frontend_port {
@@ -67,7 +94,7 @@ resource "azurerm_application_gateway" "main" {
   backend_http_settings {
     name                  = local.http_setting_name
     cookie_based_affinity = "Disabled"
-    path         = "/ping/"
+    path                  = "/ping/"
     port                  = 80
     protocol              = "Http"
     request_timeout       = 1
@@ -75,7 +102,7 @@ resource "azurerm_application_gateway" "main" {
 
   http_listener {
     name                           = local.listener_name
-    frontend_ip_configuration_name = local.frontend_ip_configuration_name
+    frontend_ip_configuration_name = "${local.frontend_ip_configuration_name}-private"
     frontend_port_name             = "${local.frontend_port_name}-80"
     protocol                       = "Http"
   }
@@ -89,17 +116,18 @@ resource "azurerm_application_gateway" "main" {
   }
 
   waf_configuration {
-    enabled = true
-    firewall_mode = "${var.waf_mode}"
-    rule_set_type = "OWASP"
+    enabled          = var.waf_enabled
+    firewall_mode    = var.waf_mode
+    rule_set_type    = "OWASP"
     rule_set_version = "3.0"
   }
 }
 
 resource "azurerm_monitor_diagnostic_setting" "main" {
-  name                       = "${var.name}-log-analytics"
+  count                      = var.log_analytics_workspace_id != null ? 1 : 0
+  name                       = "${var.name}-appgw-log-analytics"
   target_resource_id         = azurerm_application_gateway.main.id
-  log_analytics_workspace_id = "${data.terraform_remote_state.setup.log_resource_id}"
+  log_analytics_workspace_id = var.log_analytics_workspace_id
 
   log {
     category = "ApplicationGatewayAccessLog"
