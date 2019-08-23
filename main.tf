@@ -29,6 +29,18 @@ resource "azurerm_resource_group" "main" {
 }
 
 #
+# User Managed Identity
+#
+
+resource "azurerm_user_assigned_identity" "main" {
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  name = "${var.name}-umi"
+
+  tags = var.tags
+}
+
+#
 # Public IP
 #
 
@@ -59,6 +71,11 @@ resource "azurerm_application_gateway" "main" {
     name     = local.sku_name
     tier     = local.sku_tier
     capacity = var.capacity.min
+  }
+
+  identity {
+    type = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.main.id]
   }
 
   gateway_ip_configuration {
