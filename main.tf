@@ -35,7 +35,7 @@ resource "azurerm_resource_group" "main" {
 resource "azurerm_user_assigned_identity" "main" {
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
-  name = "${var.name}-umi"
+  name = "${var.name}-uai"
 
   tags = var.tags
 }
@@ -92,6 +92,7 @@ resource "azurerm_application_gateway" "main" {
     name                          = "${local.frontend_ip_configuration_name}-private"
     private_ip_address_allocation = "Static"
     private_ip_address            = var.private_ip_address
+    subnet_id = var.subnet_id
   }
 
   frontend_port {
