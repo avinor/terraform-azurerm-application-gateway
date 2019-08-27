@@ -15,6 +15,8 @@ locals {
   http_setting_name              = "${var.name}-be-htst"
   listener_name                  = "${var.name}-httplstn"
   request_routing_rule_name      = "${var.name}-rqrt"
+
+  merged_tags = merge(var.tags, { managed-by-k8s-ingress = "" })
 }
 
 #
@@ -35,7 +37,7 @@ resource "azurerm_resource_group" "main" {
 resource "azurerm_user_assigned_identity" "main" {
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
-  name = "${var.name}-uai"
+  name                = "${var.name}-uai"
 
   tags = var.tags
 }
@@ -63,9 +65,9 @@ resource "azurerm_application_gateway" "main" {
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   enable_http2        = true
-  zones = var.zones
+  zones               = var.zones
 
-  tags = var.tags
+  tags = local.merged_tags
 
   sku {
     name     = local.sku_name
@@ -74,7 +76,7 @@ resource "azurerm_application_gateway" "main" {
   }
 
   identity {
-    type = "UserAssigned"
+    type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.main.id]
   }
 
@@ -84,15 +86,15 @@ resource "azurerm_application_gateway" "main" {
   }
 
   frontend_ip_configuration {
-    name                          = "${local.frontend_ip_configuration_name}-public"
-    public_ip_address_id          = azurerm_public_ip.main.id
+    name                 = "${local.frontend_ip_configuration_name}-public"
+    public_ip_address_id = azurerm_public_ip.main.id
   }
 
   frontend_ip_configuration {
     name                          = "${local.frontend_ip_configuration_name}-private"
     private_ip_address_allocation = "Static"
     private_ip_address            = var.private_ip_address
-    subnet_id = var.subnet_id
+    subnet_id                     = var.subnet_id
   }
 
   frontend_port {
@@ -133,11 +135,29 @@ resource "azurerm_application_gateway" "main" {
     backend_http_settings_name = local.http_setting_name
   }
 
+  ssl_policy {
+    policy_type = "Predefined"
+    policy_name = var.ssl_policy_name
+  }
+
   waf_configuration {
     enabled          = var.waf_enabled
     firewall_mode    = var.waf_mode
     rule_set_type    = "OWASP"
     rule_set_version = "3.0"
+  }
+
+  // Ignore most changes as they should be managed by AKS ingress controller
+  lifecycle {
+    ignore_changes = [
+      "backend_address_pool",
+      "backend_http_settings",
+      "frontend_port",
+      "http_listener",
+      "probe",
+      "request_routing_rule",
+      tags["managed-by-k8s-ingress"],
+    ]
   }
 }
 

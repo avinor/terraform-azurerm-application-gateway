@@ -15,8 +15,8 @@ output "name" {
 
 output "user_assigned_identity" {
   description = "Resource id and client id of the user assigned identity."
-  value       = {
-      id = azurerm_user_assigned_identity.main.id
-      client_id = azurerm_user_assigned_identity.main.client_id
+  value = {
+    id        = azurerm_user_assigned_identity.main.id
+    client_id = azurerm_user_assigned_identity.main.client_id
   }
 }

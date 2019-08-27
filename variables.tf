@@ -45,6 +45,11 @@ variable "waf_mode" {
   default     = "Prevention"
 }
 
+variable "ssl_policy_name" {
+  description = "SSL Policy name"
+  default     = "AppGwSslPolicy20170401"
+}
+
 variable "tags" {
   description = "Tags to apply to all resources created."
   type        = map(string)
