@@ -141,10 +141,21 @@ resource "azurerm_application_gateway" "main" {
   }
 
   waf_configuration {
-    enabled          = var.waf_enabled
-    firewall_mode    = var.waf_mode
-    rule_set_type    = "OWASP"
-    rule_set_version = "3.0"
+    enabled                  = var.waf_enabled
+    firewall_mode            = coalesce(var.waf_configuration.firewall_mode, "Prevention")
+    rule_set_type            = coalesce(var.waf_configuration.rule_set_type, "OWASP")
+    rule_set_version         = coalesce(var.waf_configuration.rule_set_version, "3.0")
+    file_upload_limit_mb     = coalesce(var.waf_configuration.file_upload_limit_mb, 100)
+    max_request_body_size_kb = coalesce(var.waf_configuration.max_request_body_size_kb, 128)
+  }
+
+  dynamic "custom_error_configuration" {
+    for_each = var.custom_error
+    iterator = ce
+    content {
+      status_code           = ce.value.status_code
+      custom_error_page_url = ce.value.error_page_url
+    }
   }
 
   // Ignore most changes as they should be managed by AKS ingress controller

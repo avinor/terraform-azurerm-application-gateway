@@ -40,14 +40,21 @@ variable "waf_enabled" {
   default     = true
 }
 
-variable "waf_mode" {
-  description = "The Web Application Firewall Mode."
-  default     = "Prevention"
+variable "waf_configuration" {
+  description = "Configuration block for WAF."
+  type        = object({ firewall_mode = string, rule_set_type = string, rule_set_version = string, file_upload_limit_mb = number, max_request_body_size_kb = number })
+  default     = null
 }
 
 variable "ssl_policy_name" {
   description = "SSL Policy name"
   default     = "AppGwSslPolicy20170401"
+}
+
+variable "custom_error" {
+  description = "List of custom error configurations, only support status code `HttpStatus403` and `HttpStatus502`."
+  type        = list(object({ status_code = string, error_page_url = string }))
+  default     = []
 }
 
 variable "tags" {
