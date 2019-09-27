@@ -179,6 +179,9 @@ resource "azurerm_application_gateway" "main" {
       "http_listener",
       "probe",
       "request_routing_rule",
+      "url_path_map",
+      "ssl_certificate",
+      "redirect_configuration",
       tags["managed-by-k8s-ingress"],
     ]
   }
