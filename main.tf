@@ -42,6 +42,24 @@ resource "azurerm_user_assigned_identity" "main" {
   tags = var.tags
 }
 
+resource "azurerm_role_assignment" "self" {
+  scope                = azurerm_user_assigned_identity.main.id
+  role_definition_name = "Managed Identity Operator"
+  principal_id         = azurerm_user_assigned_identity.main.principal_id
+}
+
+resource "azurerm_role_assignment" "appgw" {
+  scope                = azurerm_application_gateway.main.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_user_assigned_identity.main.principal_id
+}
+
+resource "azurerm_role_assignment" "rg" {
+  scope                = azurerm_resource_group.main.id
+  role_definition_name = "Reader"
+  principal_id         = azurerm_user_assigned_identity.main.principal_id
+}
+
 #
 # Public IP
 #
@@ -167,6 +185,9 @@ resource "azurerm_application_gateway" "main" {
       "http_listener",
       "probe",
       "request_routing_rule",
+      "url_path_map",
+      "ssl_certificate",
+      "redirect_configuration",
       tags["managed-by-k8s-ingress"],
     ]
   }
