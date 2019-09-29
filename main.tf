@@ -193,6 +193,39 @@ resource "azurerm_application_gateway" "main" {
   }
 }
 
+resource "azurerm_web_application_firewall_policy" "main" {
+  count               = length(var.custom_policies) > 0 ? 1 : 0
+  name                = "${var.name}-wafpolicy"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+
+  dynamic "custom_rules" {
+    for_each = var.custom_policies
+    iterator = cp
+    content {
+      name      = cp.value.name
+      priority  = cp.value.priority
+      rule_type = cp.value.rule_type
+      action    = cp.value.action
+
+      match_conditions = [
+        for cond in cp.value.match_conditions : {
+          match_variables = [
+            {
+              variable_name = cond.match_variable
+              selector      = cond.selector
+            }
+          ]
+
+          operator           = cond.operator
+          negation_condition = cond.negation_condition
+          match_values       = cond.match_values
+        }
+      ]
+    }
+  }
+}
+
 resource "azurerm_monitor_diagnostic_setting" "main" {
   count                      = var.log_analytics_workspace_id != null ? 1 : 0
   name                       = "${var.name}-appgw-log-analytics"
