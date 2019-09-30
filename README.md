@@ -34,6 +34,41 @@ inputs {
 
 To enable WAF set `waf_enabled` to true and it will automatically deploy sku WAF_v2 (this required redeploy if it was disabled). To configure WAF settings set the `waf_configuration` variable. It will default to resonable values.
 
+### Custom policies
+
+In addition to the default policies in firewall it is also possible to add custom policies. These can be additional security rules or exceptions to allow traffic. Using the `custom_policies` variable it is possible to customize the firewall rules. It will create a custom policy, but at the moment not associate it with the firewall as there is no resource to do so.
+
+`custom_policies` variable follow similar structure as the terraform resource. Priority will be set according to order in list, higher priority for elements early in the list.
+
+Example of policy:
+
+```terraform
+custom_policies = [
+    {
+        name = "AllowRefererBeginWithExample"
+        rule_type = "MatchRule"
+        action = "Allow"
+
+        match_conditions = [
+            {
+                match_variables = [
+                    {
+                        match_variable = "RequestHeaders"
+                        selector = "referer"
+                    }
+                ]
+
+                operator = "BeginsWith"
+                negation_condition = false
+                match_values = ["https://example.com"]
+            }
+        ]
+    }
+]
+```
+
+For details how to write custom policies see the [Microsoft documentation](https://docs.microsoft.com/en-us/azure/application-gateway/custom-waf-rules-overview).
+
 ## Managed Identity
 
 Since this module was created to be used together with AKS it also creates a managed identity that have access to modify the Application Gateway. Id and client_id of managed identity is part of output and can be used by external application to control configurations.
