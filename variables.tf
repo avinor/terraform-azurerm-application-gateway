@@ -21,6 +21,7 @@ variable "private_ip_address" {
 variable "capacity" {
   description = "Min and max capacity for auto scaling"
   type        = object({ min = number, max = number })
+  default     = null
 }
 
 variable "diagnostics" {

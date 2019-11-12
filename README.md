@@ -1,5 +1,7 @@
 # Application Gateway
 
+*This template is not optimal at the moment due to missing azurerm provider features. Will be fixed as soon as there is an updated provider*
+
 This module deploys a simplified version of Application Gateway v2, it does not support v1 of Application Gateway. It is a slim down version that is meant to be configured by an external application, in this case https://github.com/Azure/application-gateway-kubernetes-ingress. It will create some endpoints and backends because that is required, but will ignore any changes to them on later deployments. That way any changes done by external application will be kept.
 
 Although it is slimmed down there are some options to configure the security policies, private ip and waf configurations. It will however always use sku Standard_v2 or WAF_v2 based on if waf is enabled.
@@ -41,6 +43,8 @@ Setting `all` in logs and metrics will send all possible diagnostics to destinat
 To enable WAF set `waf_enabled` to true and it will automatically deploy sku WAF_v2 (this required redeploy if it was disabled). To configure WAF settings set the `waf_configuration` variable. It will default to resonable values.
 
 ### Custom policies
+
+**Not working!!** Due to some changes in waf policies these are not working at the momemt. Waiting on terraform update.
 
 In addition to the default policies in firewall it is also possible to add custom policies. These can be additional security rules or exceptions to allow traffic. Using the `custom_policies` variable it is possible to customize the firewall rules. It will create a custom policy, but at the moment not associate it with the firewall as there is no resource to do so.
 

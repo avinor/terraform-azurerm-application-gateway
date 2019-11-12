@@ -112,9 +112,13 @@ resource "azurerm_application_gateway" "main" {
   tags = local.merged_tags
 
   sku {
-    name     = local.sku_name
-    tier     = local.sku_tier
-    capacity = var.capacity.min
+    name = local.sku_name
+    tier = local.sku_tier
+  }
+
+  autoscale_configuration {
+    min_capacity = var.capacity.min
+    max_capacity = var.capacity.max
   }
 
   identity {
@@ -219,7 +223,7 @@ resource "azurerm_application_gateway" "main" {
 
 resource "azurerm_web_application_firewall_policy" "main" {
   count               = length(var.custom_policies) > 0 ? 1 : 0
-  name                = "${var.name}-wafpolicy"
+  name                = format("%swafpolicy", lower(replace(var.name, "/[[:^alnum:]]/", "")))
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
 
