@@ -228,24 +228,28 @@ resource "azurerm_web_application_firewall_policy" "main" {
     iterator = cp
     content {
       name      = cp.value.name
-      priority  = cp.value.priority
+      priority  = (cp.key + 1) * 10
       rule_type = cp.value.rule_type
       action    = cp.value.action
 
-      match_conditions = [
-        for cond in cp.value.match_conditions : {
-          match_variables = [
-            {
-              variable_name = cond.match_variable
-              selector      = cond.selector
+      dynamic "match_conditions" {
+        for_each = cp.value.match_conditions
+        iterator = mc
+        content {
+          dynamic "match_variables" {
+            for_each = mc.value.match_variables
+            iterator = mv
+            content {
+              variable_name = mv.value.match_variable
+              selector      = mv.value.selector
             }
-          ]
+          }
 
-          operator           = cond.operator
-          negation_condition = cond.negation_condition
-          match_values       = cond.match_values
+          operator           = mc.value.operator
+          negation_condition = mc.value.negation_condition
+          match_values       = mc.value.match_values
         }
-      ]
+      }
     }
   }
 }

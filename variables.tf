@@ -49,7 +49,7 @@ variable "waf_configuration" {
 
 variable "custom_policies" {
   description = "List of custom firewall policies. See https://docs.microsoft.com/en-us/azure/application-gateway/custom-waf-rules-overview."
-  type        = list(object({ name = string, priority = number, rule_type = string, action = string, match_conditions = list(object({ match_variable = string, selector = string, operator = string, negation_condition = bool, match_values = list(string) })) }))
+  type        = list(object({ name = string, rule_type = string, action = string, match_conditions = list(object({ match_variables = list(object({ match_variable = string, selector = string })), operator = string, negation_condition = bool, match_values = list(string) })) }))
   default     = []
 }
 
