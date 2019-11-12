@@ -23,8 +23,9 @@ variable "capacity" {
   type        = object({ min = number, max = number })
 }
 
-variable "log_analytics_workspace_id" {
-  description = "Specifies the ID of a Log Analytics Workspace where Diagnostics Data should be sent."
+variable "diagnostics" {
+  description = "Diagnostic settings for those resources that support it. See README.md for details on configuration."
+  type        = object({ destination = string, eventhub_name = string, logs = list(string), metrics = list(string) })
   default     = null
 }
 

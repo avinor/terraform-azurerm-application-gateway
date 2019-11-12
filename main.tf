@@ -1,7 +1,7 @@
 terraform {
-  required_version = ">= 0.12.0"
+  required_version = ">= 0.12.6"
   required_providers {
-    azurerm = ">= 1.34.0"
+    azurerm = "~> 1.36.0"
   }
 }
 
@@ -17,6 +17,30 @@ locals {
   request_routing_rule_name      = "${var.name}-rqrt"
 
   merged_tags = merge(var.tags, { managed-by-k8s-ingress = "" })
+
+  diag_appgw_logs = [
+    "ApplicationGatewayAccessLog",
+    "ApplicationGatewayPerformanceLog",
+    "ApplicationGatewayFirewallLog",
+  ]
+  diag_appgw_metrics = [
+    "AllMetrics",
+  ]
+
+  diag_resource_list = var.diagnostics != null ? split("/", var.diagnostics.destination) : []
+  parsed_diag = var.diagnostics != null ? {
+    log_analytics_id   = contains(local.diag_resource_list, "microsoft.operationalinsights") ? var.diagnostics.destination : null
+    storage_account_id = contains(local.diag_resource_list, "Microsoft.Storage") ? var.diagnostics.destination : null
+    event_hub_auth_id  = contains(local.diag_resource_list, "Microsoft.EventHub") ? var.diagnostics.destination : null
+    metric             = contains(var.diagnostics.metrics, "all") ? local.diag_appgw_metrics : var.diagnostics.metrics
+    log                = contains(var.diagnostics.logs, "all") ? local.diag_appgw_logs : var.diagnostics.logs
+    } : {
+    log_analytics_id   = null
+    storage_account_id = null
+    event_hub_auth_id  = null
+    metric             = []
+    log                = []
+  }
 }
 
 #
@@ -227,40 +251,33 @@ resource "azurerm_web_application_firewall_policy" "main" {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "main" {
-  count                      = var.log_analytics_workspace_id != null ? 1 : 0
-  name                       = "${var.name}-appgw-log-analytics"
-  target_resource_id         = azurerm_application_gateway.main.id
-  log_analytics_workspace_id = var.log_analytics_workspace_id
+  count                          = var.diagnostics != null ? 1 : 0
+  name                           = "${var.name}-appgw-diag"
+  target_resource_id             = azurerm_application_gateway.main.id
+  log_analytics_workspace_id     = local.parsed_diag.log_analytics_id
+  eventhub_authorization_rule_id = local.parsed_diag.event_hub_auth_id
+  eventhub_name                  = local.parsed_diag.event_hub_auth_id != null ? var.diagnostics.eventhub_name : null
+  storage_account_id             = local.parsed_diag.storage_account_id
 
-  log {
-    category = "ApplicationGatewayAccessLog"
+  dynamic "log" {
+    for_each = local.parsed_diag.log
+    content {
+      category = log.value
 
-    retention_policy {
-      enabled = false
+      retention_policy {
+        enabled = false
+      }
     }
   }
 
-  log {
-    category = "ApplicationGatewayPerformanceLog"
+  dynamic "metric" {
+    for_each = local.parsed_diag.metric
+    content {
+      category = metric.value
 
-    retention_policy {
-      enabled = false
-    }
-  }
-
-  log {
-    category = "ApplicationGatewayFirewallLog"
-
-    retention_policy {
-      enabled = false
-    }
-  }
-
-  metric {
-    category = "AllMetrics"
-
-    retention_policy {
-      enabled = false
+      retention_policy {
+        enabled = false
+      }
     }
   }
 }
