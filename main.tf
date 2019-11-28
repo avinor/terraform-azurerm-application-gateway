@@ -216,6 +216,7 @@ resource "azurerm_application_gateway" "main" {
       "url_path_map",
       "ssl_certificate",
       "redirect_configuration",
+      "autoscale_configuration",
       tags["managed-by-k8s-ingress"],
       tags["last-updated-by-k8s-ingress"],
     ]
