@@ -16,7 +16,7 @@ locals {
   listener_name                  = "${var.name}-httplstn"
   request_routing_rule_name      = "${var.name}-rqrt"
 
-  merged_tags = merge(var.tags, { managed-by-k8s-ingress = "" })
+  merged_tags = merge(var.tags, { managed-by-k8s-ingress = "", last-updated-by-k8s-ingress = "" })
 
   diag_appgw_logs = [
     "ApplicationGatewayAccessLog",
@@ -217,6 +217,7 @@ resource "azurerm_application_gateway" "main" {
       "ssl_certificate",
       "redirect_configuration",
       tags["managed-by-k8s-ingress"],
+      tags["last-updated-by-k8s-ingress"],
     ]
   }
 }
