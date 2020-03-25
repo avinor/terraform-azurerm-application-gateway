@@ -207,16 +207,16 @@ resource "azurerm_application_gateway" "main" {
   // Ignore most changes as they should be managed by AKS ingress controller
   lifecycle {
     ignore_changes = [
-      "backend_address_pool",
-      "backend_http_settings",
-      "frontend_port",
-      "http_listener",
-      "probe",
-      "request_routing_rule",
-      "url_path_map",
-      "ssl_certificate",
-      "redirect_configuration",
-      "autoscale_configuration",
+      backend_address_pool,
+      backend_http_settings,
+      frontend_port,
+      http_listener,
+      probe,
+      request_routing_rule,
+      url_path_map,
+      ssl_certificate,
+      redirect_configuration,
+      autoscale_configuration,
       tags["managed-by-k8s-ingress"],
       tags["last-updated-by-k8s-ingress"],
     ]

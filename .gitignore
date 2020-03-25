@@ -7,3 +7,8 @@
 
 # .tfvars files
 *.tfvars
+
+# Intellij IDEA
+.idea
+*.iml
+
