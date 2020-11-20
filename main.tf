@@ -1,8 +1,10 @@
 terraform {
   required_version = ">= 0.12.6"
-  required_providers {
-    azurerm = "~> 1.44.0"
-  }
+}
+
+provider azurerm {
+  version = "~> 2.37.0"
+  features {}
 }
 
 locals {
@@ -224,7 +226,7 @@ resource "azurerm_application_gateway" "main" {
 }
 
 resource "azurerm_web_application_firewall_policy" "main" {
-  count               = length(var.custom_policies) > 0 ? 1 : 0
+  count               = length(var.custom_policies) + length(var.managed_policies_override) > 0 ? 1 : 0
   name                = format("%swafpolicy", lower(replace(var.name, "/[[:^alnum:]]/", "")))
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
@@ -254,6 +256,22 @@ resource "azurerm_web_application_firewall_policy" "main" {
           operator           = mc.value.operator
           negation_condition = mc.value.negation_condition
           match_values       = mc.value.match_values
+        }
+      }
+    }
+  }
+
+  managed_rules {
+    managed_rule_set {
+      type    = var.waf_configuration.rule_set_type
+      version = var.waf_configuration.rule_set_version
+
+      dynamic "rule_group_override" {
+        for_each = var.managed_policies_override
+        iterator = rg
+        content {
+          rule_group_name = rg.value.rule_group_name
+          disabled_rules  = rg.value.disabled_rules
         }
       }
     }

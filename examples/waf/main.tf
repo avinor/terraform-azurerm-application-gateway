@@ -23,4 +23,21 @@ module "simple" {
         file_upload_limit_mb     = 100
         max_request_body_size_kb = 128
     }
+
+    managed_policies_override = [
+        {
+            rule_group_name = "REQUEST-920-PROTOCOL-ENFORCEMENT"
+            disabled_rules = [
+                "920300",
+                "920440",
+            ]
+        },
+        {
+            rule_group_name = "REQUEST-930-APPLICATION-ATTACK-LFI"
+            disabled_rules = [
+                "930100",
+            ]
+        },
+    ]
+
 }
