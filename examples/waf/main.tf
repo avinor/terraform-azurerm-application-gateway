@@ -35,4 +35,27 @@ module "waf" {
     },
   ]
 
+  custom_policies = [
+    {
+      name      = "AllowRefererBeginWithExample"
+      rule_type = "MatchRule"
+      action    = "Allow"
+
+      match_conditions = [
+        {
+          match_variables = [
+            {
+              match_variable = "RequestHeaders"
+              selector       = "referer"
+            }
+          ]
+
+          operator           = "BeginsWith"
+          negation_condition = false
+          match_values       = ["https://example.com"]
+        }
+      ]
+    }
+  ]
+
 }
