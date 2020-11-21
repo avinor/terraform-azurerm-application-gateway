@@ -190,11 +190,11 @@ resource "azurerm_application_gateway" "main" {
 
   waf_configuration {
     enabled                  = var.waf_enabled
-    firewall_mode            = coalesce(var.waf_configuration.firewall_mode, "Prevention")
-    rule_set_type            = coalesce(var.waf_configuration.rule_set_type, "OWASP")
-    rule_set_version         = coalesce(var.waf_configuration.rule_set_version, "3.0")
-    file_upload_limit_mb     = coalesce(var.waf_configuration.file_upload_limit_mb, 100)
-    max_request_body_size_kb = coalesce(var.waf_configuration.max_request_body_size_kb, 128)
+    firewall_mode            = coalesce(var.waf_configuration != null ? var.waf_configuration.firewall_mode : null, "Prevention")
+    rule_set_type            = coalesce(var.waf_configuration != null ? var.waf_configuration.rule_set_type : null, "OWASP")
+    rule_set_version         = coalesce(var.waf_configuration != null ? var.waf_configuration.rule_set_version : null, "3.0")
+    file_upload_limit_mb     = coalesce(var.waf_configuration != null ? var.waf_configuration.file_upload_limit_mb : null, 100)
+    max_request_body_size_kb = coalesce(var.waf_configuration != null ? var.waf_configuration.max_request_body_size_kb : null, 128)
   }
 
   dynamic "custom_error_configuration" {
