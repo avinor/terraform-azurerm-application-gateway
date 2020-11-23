@@ -110,6 +110,7 @@ resource "azurerm_application_gateway" "main" {
   location            = azurerm_resource_group.main.location
   enable_http2        = true
   zones               = var.zones
+  firewall_policy_id  = azurerm_web_application_firewall_policy.main.id
 
   tags = local.merged_tags
 
@@ -226,10 +227,19 @@ resource "azurerm_application_gateway" "main" {
 }
 
 resource "azurerm_web_application_firewall_policy" "main" {
-  count               = length(var.custom_policies) + length(var.managed_policies_override) > 0 ? 1 : 0
   name                = format("%swafpolicy", lower(replace(var.name, "/[[:^alnum:]]/", "")))
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
+
+  tags = var.tags
+
+  policy_settings {
+    enabled                     = var.waf_enabled
+    file_upload_limit_in_mb     = coalesce(var.waf_configuration != null ? var.waf_configuration.file_upload_limit_mb : null, 100)
+    max_request_body_size_in_kb = coalesce(var.waf_configuration != null ? var.waf_configuration.max_request_body_size_kb : null, 128)
+    mode                        = coalesce(var.waf_configuration != null ? var.waf_configuration.firewall_mode : null, "Prevention")
+    request_body_check          = true
+  }
 
   dynamic "custom_rules" {
     for_each = var.custom_policies
