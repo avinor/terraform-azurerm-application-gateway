@@ -93,7 +93,7 @@ managed_policies_override = [
 ]
 ```
 
-for details for managed rules se the [Micirisft documentation](https://docs.microsoft.com/en-us/azure/web-application-firewall/ag/application-gateway-crs-rulegroups-rules?tabs=owasp31)
+for details for managed rules se the [Microsoft documentation](https://docs.microsoft.com/en-us/azure/web-application-firewall/ag/application-gateway-crs-rulegroups-rules?tabs=owasp31)
 
 ## Managed Identity
 
