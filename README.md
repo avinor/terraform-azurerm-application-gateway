@@ -45,9 +45,7 @@ To enable WAF set `waf_enabled` to true and it will automatically deploy sku WAF
 
 ### Custom policies
 
-**Not working!!** Due to some changes in waf policies these are not working at the momemt. Waiting on terraform update.
-
-In addition to the default policies in firewall it is also possible to add custom policies. These can be additional security rules or exceptions to allow traffic. Using the `custom_policies` variable it is possible to customize the firewall rules. It will create a custom policy, but at the moment not associate it with the firewall as there is no resource to do so.
+In addition to the default policies in firewall it is also possible to add custom policies. These can be additional security rules or exceptions to allow traffic. Using the `custom_policies` variable it is possible to customize the firewall rules. It will create a custom policy and associate it with the firewall.
 
 `custom_policies` variable follow similar structure as the terraform resource. Priority will be set according to order in list, higher priority for elements early in the list.
 
@@ -77,6 +75,25 @@ custom_policies = [
 ```
 
 For details how to write custom policies see the [Microsoft documentation](https://docs.microsoft.com/en-us/azure/application-gateway/custom-waf-rules-overview).
+
+### Managed rules
+
+It is possible to add waf policies for managed rules to disable rules.
+ 
+```terraform
+managed_policies_override = [
+  {
+    rule_group_name = "REQUEST-920-PROTOCOL-ENFORCEMENT"
+    disabled_rules  = ["920300", "920440"]
+  },
+  {
+    rule_group_name = "REQUEST-930-APPLICATION-ATTACK-LFI"
+    disabled_rules  = ["930100"]
+  },
+]
+```
+
+for details for managed rules se the [Micirisft documentation](https://docs.microsoft.com/en-us/azure/web-application-firewall/ag/application-gateway-crs-rulegroups-rules?tabs=owasp31)
 
 ## Managed Identity
 
