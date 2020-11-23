@@ -16,7 +16,7 @@ module {
   version = "1.0.0"
 }
 
-input {
+inputs {
   name                = "simple"
   resource_group_name = "appgw-rg"
   location            = "westeurope"
