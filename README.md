@@ -12,23 +12,24 @@ To create a simple application gateway deployed with [tau](https://github.com/av
 
 ```terraform
 module {
-    source = "avinor/application-gateway/azurerm"
-    version = "1.0.0"
+  source = "avinor/application-gateway/azurerm"
+  version = "1.0.0"
 }
 
 inputs {
-    name = "simple"
-    resource_group_name = "appgw-rg"
-    subnet_id = "/subscriptions/...."
+  name                = "simple"
+  resource_group_name = "appgw-rg"
+  location            = "westeurope"
+  subnet_id           = "/subscriptions/...."
 
-    private_ip_address = "10.0.0.100"
+  private_ip_address = "10.0.0.100"
 
-    capacity = {
-        min = 1
-        max = 2
-    }
+  capacity = {
+    min = 1
+    max = 2
+  }
 
-    zones = ["1", "2", "3"]
+  zones = ["1", "2", "3"]
 }
 ```
 
@@ -54,26 +55,24 @@ Example of policy:
 
 ```terraform
 custom_policies = [
-    {
-        name = "AllowRefererBeginWithExample"
-        rule_type = "MatchRule"
-        action = "Allow"
-
-        match_conditions = [
-            {
-                match_variables = [
-                    {
-                        match_variable = "RequestHeaders"
-                        selector = "referer"
-                    }
-                ]
-
-                operator = "BeginsWith"
-                negation_condition = false
-                match_values = ["https://example.com"]
-            }
+  {
+    name      = "AllowRefererBeginWithExample"
+    rule_type = "MatchRule"
+    action    = "Allow"
+    match_conditions = [
+      {
+        match_variables = [
+          {
+            match_variable = "RequestHeaders"
+            selector       = "referer"
+          }
         ]
-    }
+        operator           = "BeginsWith"
+        negation_condition = false
+        match_values       = ["https://example.com"]
+      }
+    ]
+  }
 ]
 ```
 
