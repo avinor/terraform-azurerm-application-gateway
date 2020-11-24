@@ -60,10 +60,20 @@ variable "waf_configuration" {
 }
 
 variable "managed_policies_override" {
-  description = "List of managed firewall policies overrides"
+  description = "List of managed firewall policies overrides. See https://docs.microsoft.com/en-us/azure/web-application-firewall/ag/application-gateway-crs-rulegroups-rules"
   type = list(object({
     rule_group_name = string,
     disabled_rules  = list(string),
+  }))
+  default = []
+}
+
+variable "managed_policies_exclusions" {
+  description = "List of managed firewall policies exclusions"
+  type = list(object({
+    match_variable          = string,
+    selector_match_operator = string,
+    selector                = string,
   }))
   default = []
 }

@@ -273,8 +273,8 @@ resource "azurerm_web_application_firewall_policy" "main" {
 
   managed_rules {
     managed_rule_set {
-      type    = var.waf_configuration.rule_set_type
-      version = var.waf_configuration.rule_set_version
+      type    = coalesce(var.waf_configuration != null ? var.waf_configuration.rule_set_type : null, "OWASP")
+      version = coalesce(var.waf_configuration != null ? var.waf_configuration.rule_set_version : null, "3.1")
 
       dynamic "rule_group_override" {
         for_each = var.managed_policies_override
@@ -283,6 +283,16 @@ resource "azurerm_web_application_firewall_policy" "main" {
           rule_group_name = rg.value.rule_group_name
           disabled_rules  = rg.value.disabled_rules
         }
+      }
+    }
+
+    dynamic "exclusion" {
+      for_each = var.managed_policies_exclusions
+      iterator = ex
+      content {
+        match_variable          = ex.value.match_variable
+        selector                = ex.value.selector
+        selector_match_operator = ex.value.selector_match_operator
       }
     }
   }
