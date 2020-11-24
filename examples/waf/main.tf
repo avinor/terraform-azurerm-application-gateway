@@ -35,6 +35,14 @@ module "waf" {
     },
   ]
 
+  managed_policies_exclusions = [
+    {
+      match_variable          = "RequestCookieNames",
+      selector_match_operator = "Equals",
+      selector                = "SomeCookie"
+    },
+  ]
+
   custom_policies = [
     {
       name      = "AllowRefererBeginWithExample"
