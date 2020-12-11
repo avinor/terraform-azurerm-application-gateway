@@ -10,8 +10,10 @@ func TestUT_Examples(t *testing.T) {
 	t.Parallel()
 
 	tests := []string{
-		"../examples/simple",
-		"../examples/waf",
+		//"../examples/simple",
+		//"../examples/waf",
+		"../examples/diagnostics",
+		"../examples/diagnostics-eventhub",
 	}
 
 	for _, test := range tests {

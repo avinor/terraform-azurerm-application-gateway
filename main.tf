@@ -3,7 +3,7 @@ terraform {
 }
 
 provider azurerm {
-  version = "~> 2.37.0"
+  version = "~> 2.39.0"
   features {}
 }
 
@@ -298,13 +298,13 @@ resource "azurerm_web_application_firewall_policy" "main" {
   }
 }
 
-resource "azurerm_monitor_diagnostic_setting" "main" {
+resource "azurerm_monitor_diagnostic_setting" "mainlog" {
   count                          = var.diagnostics != null ? 1 : 0
-  name                           = "${var.name}-appgw-diag"
+  name                           = "${var.name}-log-appgw-diag"
   target_resource_id             = azurerm_application_gateway.main.id
   log_analytics_workspace_id     = local.parsed_diag.log_analytics_id
   eventhub_authorization_rule_id = local.parsed_diag.event_hub_auth_id
-  eventhub_name                  = local.parsed_diag.event_hub_auth_id != null ? var.diagnostics.eventhub_name : null
+  eventhub_name                  = local.parsed_diag.event_hub_auth_id != null ? var.diagnostics.eventhub_name_log : null
   storage_account_id             = local.parsed_diag.storage_account_id
 
   dynamic "log" {
@@ -317,6 +317,16 @@ resource "azurerm_monitor_diagnostic_setting" "main" {
       }
     }
   }
+}
+
+resource "azurerm_monitor_diagnostic_setting" "mainmetric" {
+  count                          = var.diagnostics != null ? 1 : 0
+  name                           = "${var.name}-metric-appgw-diag"
+  target_resource_id             = azurerm_application_gateway.main.id
+  log_analytics_workspace_id     = local.parsed_diag.log_analytics_id
+  eventhub_authorization_rule_id = local.parsed_diag.event_hub_auth_id
+  eventhub_name                  = local.parsed_diag.event_hub_auth_id != null ? var.diagnostics.eventhub_name_metric : null
+  storage_account_id             = local.parsed_diag.storage_account_id
 
   dynamic "metric" {
     for_each = local.parsed_diag.metric

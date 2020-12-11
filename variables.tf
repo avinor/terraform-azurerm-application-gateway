@@ -27,10 +27,11 @@ variable "capacity" {
 variable "diagnostics" {
   description = "Diagnostic settings for those resources that support it. See README.md for details on configuration."
   type = object({
-    destination   = string,
-    eventhub_name = string,
-    logs          = list(string),
-    metrics       = list(string),
+    destination          = string,
+    eventhub_name_log    = string,
+    eventhub_name_metric = string,
+    logs                 = list(string),
+    metrics              = list(string),
   })
   default = null
 }
