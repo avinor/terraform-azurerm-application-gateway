@@ -18,7 +18,10 @@ locals {
   listener_name                  = "${var.name}-httplstn"
   request_routing_rule_name      = "${var.name}-rqrt"
 
-  merged_tags = merge(var.tags, { managed-by-k8s-ingress = "", last-updated-by-k8s-ingress = "" })
+  merged_tags = merge(var.tags, {
+    managed-by-k8s-ingress      = "",
+    last-updated-by-k8s-ingress = ""
+  })
 
   diag_appgw_logs = [
     "ApplicationGatewayAccessLog",
@@ -317,6 +320,18 @@ resource "azurerm_monitor_diagnostic_setting" "mainlog" {
       }
     }
   }
+
+  dynamic "metric" {
+    for_each = local.parsed_diag.metric
+    content {
+      category = metric.value
+      enabled  = false
+
+      retention_policy {
+        enabled = false
+      }
+    }
+  }
 }
 
 resource "azurerm_monitor_diagnostic_setting" "mainmetric" {
@@ -327,6 +342,18 @@ resource "azurerm_monitor_diagnostic_setting" "mainmetric" {
   eventhub_authorization_rule_id = local.parsed_diag.event_hub_auth_id
   eventhub_name                  = local.parsed_diag.event_hub_auth_id != null ? var.diagnostics.eventhub_name_metric : null
   storage_account_id             = local.parsed_diag.storage_account_id
+
+  dynamic "log" {
+    for_each = local.parsed_diag.log
+    content {
+      category = log.value
+      enabled  = false
+
+      retention_policy {
+        enabled = false
+      }
+    }
+  }
 
   dynamic "metric" {
     for_each = local.parsed_diag.metric
