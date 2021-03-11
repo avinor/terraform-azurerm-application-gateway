@@ -316,7 +316,7 @@ resource "azurerm_monitor_diagnostic_setting" "mainlog" {
       category = log.value
 
       retention_policy {
-        days = 0
+        days    = 0
         enabled = false
       }
     }
@@ -329,7 +329,7 @@ resource "azurerm_monitor_diagnostic_setting" "mainlog" {
       enabled  = false
 
       retention_policy {
-        days = 0
+        days    = 0
         enabled = false
       }
     }
@@ -352,7 +352,7 @@ resource "azurerm_monitor_diagnostic_setting" "mainmetric" {
       enabled  = false
 
       retention_policy {
-        days = 0
+        days    = 0
         enabled = false
       }
     }
@@ -364,7 +364,7 @@ resource "azurerm_monitor_diagnostic_setting" "mainmetric" {
       category = metric.value
 
       retention_policy {
-        days = 0
+        days    = 0
         enabled = false
       }
     }
