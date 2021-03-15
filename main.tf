@@ -3,7 +3,7 @@ terraform {
 }
 
 provider azurerm {
-  version = "~> 2.45.0"
+  version = "~> 2.50.0"
   features {}
 }
 
@@ -34,7 +34,7 @@ locals {
 
   diag_resource_list = var.diagnostics != null ? split("/", var.diagnostics.destination) : []
   parsed_diag = var.diagnostics != null ? {
-    log_analytics_id   = contains(local.diag_resource_list, "microsoft.operationalinsights") ? var.diagnostics.destination : null
+    log_analytics_id   = contains(local.diag_resource_list, "Microsoft.OperationalInsights") ? var.diagnostics.destination : null
     storage_account_id = contains(local.diag_resource_list, "Microsoft.Storage") ? var.diagnostics.destination : null
     event_hub_auth_id  = contains(local.diag_resource_list, "Microsoft.EventHub") ? var.diagnostics.destination : null
     metric             = contains(var.diagnostics.metrics, "all") ? local.diag_appgw_metrics : var.diagnostics.metrics
@@ -316,7 +316,7 @@ resource "azurerm_monitor_diagnostic_setting" "mainlog" {
       category = log.value
 
       retention_policy {
-        days = 0
+        days    = 0
         enabled = false
       }
     }
@@ -329,7 +329,7 @@ resource "azurerm_monitor_diagnostic_setting" "mainlog" {
       enabled  = false
 
       retention_policy {
-        days = 0
+        days    = 0
         enabled = false
       }
     }
@@ -352,7 +352,7 @@ resource "azurerm_monitor_diagnostic_setting" "mainmetric" {
       enabled  = false
 
       retention_policy {
-        days = 0
+        days    = 0
         enabled = false
       }
     }
@@ -364,7 +364,7 @@ resource "azurerm_monitor_diagnostic_setting" "mainmetric" {
       category = metric.value
 
       retention_policy {
-        days = 0
+        days    = 0
         enabled = false
       }
     }
