@@ -1,4 +1,4 @@
-module "simple" {
+module "diagnostics" {
   source = "../../"
 
   name                = "diagnostics"
@@ -16,10 +16,9 @@ module "simple" {
   zones = ["1", "2", "3"]
 
   diagnostics = {
-    destination          = "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourceGroups/XXXXXXXXXX/providers/Microsoft.EventHub/namespaces/XXXXXXXXXX"
-    eventhub_name_log    = "diagnostics-log"
-    eventhub_name_metric = "diagnostics-metric"
-    logs                 = ["all"]
-    metrics              = ["all"]
+    destination   = "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourceGroups/XXXXXXXXXX/providers/Microsoft.EventHub/namespaces/XXXXXXXXXX/authorizationRules/myrule"
+    eventhub_name = "diagnostics"
+    logs          = ["all"]
+    metrics       = ["all"]
   }
 }
