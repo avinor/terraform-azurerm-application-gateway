@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 0.12.6"
   required_providers {
     azurerm = {
-      version = "~> 2.44.0"
+      version = "~> 2.53.0"
     }
   }
 }
@@ -70,6 +70,9 @@ resource "azurerm_role_assignment" "self" {
   scope                = azurerm_user_assigned_identity.main.id
   role_definition_name = "Managed Identity Operator"
   principal_id         = azurerm_user_assigned_identity.main.principal_id
+  lifecycle {
+    ignore_changes = [scope]
+  }
 }
 
 resource "azurerm_role_assignment" "appgw" {
