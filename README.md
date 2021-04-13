@@ -35,7 +35,7 @@ inputs {
 
 ## Diagnostics
 
-Diagnostics settings can be sent to either storage account, event hub or Log Analytics workspace. The variable `diagnostics.destination` is the id of receiver, ie. storage account id, event namespace authorization rule id or log analytics resource id. Depending on what id is it will detect where to send. Unless using event namespace the `eventhub_name_log` and `eventhub_name_metric` is not required, just set to `null` for storage account and log analytics workspace.
+Diagnostics settings can be sent to either storage account, event hub or Log Analytics workspace. The variable `diagnostics.destination` is the id of receiver, ie. storage account id, event namespace authorization rule id or log analytics resource id. Depending on what id is it will detect where to send. Unless using event namespace the `eventhub_name` is not required, just set to `null` for storage account and log analytics workspace.
 
 Setting `all` in logs and metrics will send all possible diagnostics to destination. If not using `all` type name of categories to send.
 

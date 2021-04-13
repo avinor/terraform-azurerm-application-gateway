@@ -20,18 +20,20 @@ variable "private_ip_address" {
 
 variable "capacity" {
   description = "Min and max capacity for auto scaling"
-  type        = object({ min = number, max = number })
-  default     = null
+  type = object({
+    min = number
+    max = number
+  })
+  default = null
 }
 
 variable "diagnostics" {
   description = "Diagnostic settings for those resources that support it. See README.md for details on configuration."
   type = object({
-    destination          = string,
-    eventhub_name_log    = string,
-    eventhub_name_metric = string,
-    logs                 = list(string),
-    metrics              = list(string),
+    destination   = string
+    eventhub_name = string
+    logs          = list(string)
+    metrics       = list(string)
   })
   default = null
 }
@@ -51,11 +53,11 @@ variable "waf_enabled" {
 variable "waf_configuration" {
   description = "Configuration block for WAF."
   type = object({
-    firewall_mode            = string,
-    rule_set_type            = string,
-    rule_set_version         = string,
-    file_upload_limit_mb     = number,
-    max_request_body_size_kb = number,
+    firewall_mode            = string
+    rule_set_type            = string
+    rule_set_version         = string
+    file_upload_limit_mb     = number
+    max_request_body_size_kb = number
   })
   default = null
 }
@@ -63,8 +65,8 @@ variable "waf_configuration" {
 variable "managed_policies_override" {
   description = "List of managed firewall policies overrides. See https://docs.microsoft.com/en-us/azure/web-application-firewall/ag/application-gateway-crs-rulegroups-rules"
   type = list(object({
-    rule_group_name = string,
-    disabled_rules  = list(string),
+    rule_group_name = string
+    disabled_rules  = list(string)
   }))
   default = []
 }
@@ -72,9 +74,9 @@ variable "managed_policies_override" {
 variable "managed_policies_exclusions" {
   description = "List of managed firewall policies exclusions"
   type = list(object({
-    match_variable          = string,
-    selector_match_operator = string,
-    selector                = string,
+    match_variable          = string
+    selector_match_operator = string
+    selector                = string
   }))
   default = []
 }
@@ -82,17 +84,17 @@ variable "managed_policies_exclusions" {
 variable "custom_policies" {
   description = "List of custom firewall policies. See https://docs.microsoft.com/en-us/azure/application-gateway/custom-waf-rules-overview."
   type = list(object({
-    name      = string,
-    rule_type = string,
-    action    = string,
+    name      = string
+    rule_type = string
+    action    = string
     match_conditions = list(object({
       match_variables = list(object({
-        match_variable = string,
+        match_variable = string
         selector       = string
       })),
-      operator           = string,
-      negation_condition = bool,
-      match_values       = list(string),
+      operator           = string
+      negation_condition = bool
+      match_values       = list(string)
     }))
   }))
   default = []
@@ -106,8 +108,8 @@ variable "ssl_policy_name" {
 variable "custom_error" {
   description = "List of custom error configurations, only support status code `HttpStatus403` and `HttpStatus502`."
   type = list(object({
-    status_code    = string,
-    error_page_url = string,
+    status_code    = string
+    error_page_url = string
   }))
   default = []
 }
