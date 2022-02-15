@@ -200,6 +200,52 @@ resource "azurerm_application_gateway" "main" {
     max_request_body_size_kb = coalesce(var.waf_configuration != null ? var.waf_configuration.max_request_body_size_kb : null, 128)
   }
 
+  dynamic "rewrite_rule_set" {
+    for_each = var.rewrite_rule_sets
+    iterator = it0
+    content {
+      name = it0.value.name
+      dynamic "rewrite_rule" {
+        for_each = it0.value.rewrite_rule
+        iterator = it
+        content {
+          name          = it.value.rule_name
+          rule_sequence = it.value.rule_sequence
+
+          dynamic "condition" {
+            for_each = it.value.condition
+            iterator = it2
+            content {
+              variable    = it2.value.variable
+              pattern     = it2.value.pattern
+              ignore_case = it2.value.ignore_case
+              negate      = it2.value.negate
+            }
+          }
+
+          dynamic "request_header_configuration" {
+            for_each = it.value.request_header_configuration
+            iterator = it3
+            content {
+              header_name  = it3.value.header_name
+              header_value = it3.value.header_value
+            }
+          }
+
+          dynamic "url" {
+            for_each = it.value.url
+            iterator = it4
+            content {
+              path         = it4.value.path
+              query_string = it4.value.query_string
+              reroute      = it4.value.reroute
+            }
+          }
+        }
+      }
+    }
+  }
+
   dynamic "custom_error_configuration" {
     for_each = var.custom_error
     iterator = ce

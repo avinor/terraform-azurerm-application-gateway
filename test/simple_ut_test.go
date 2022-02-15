@@ -12,6 +12,7 @@ func TestUT_Examples(t *testing.T) {
 	tests := []string{
 		"../examples/simple",
 		"../examples/waf",
+		"../examples/rewrite-rules",
 		"../examples/diagnostics",
 		"../examples/diagnostics-eventhub",
 	}
