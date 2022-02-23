@@ -43,6 +43,10 @@ Setting `all` in logs and metrics will send all possible diagnostics to destinat
 
 To enable WAF set `waf_enabled` to true and it will automatically deploy sku WAF_v2 (this required redeploy if it was disabled). To configure WAF settings set the `waf_configuration` variable. It will default to resonable values.
 
+## Rewrite rules
+
+Rewrite rules can be specified and should be linked to routes outside this module.
+
 ### Custom policies
 
 In addition to the default policies in firewall it is also possible to add custom policies. These can be additional security rules or exceptions to allow traffic. Using the `custom_policies` variable it is possible to customize the firewall rules. It will create a custom policy and associate it with the firewall.

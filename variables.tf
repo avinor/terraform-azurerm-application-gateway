@@ -100,6 +100,32 @@ variable "custom_policies" {
   default = []
 }
 
+variable "rewrite_rule_sets" {
+  description = "List of rewrite rules. See https://docs.microsoft.com/en-us/azure/application-gateway/rewrite-http-headers-url"
+  type = list(object({
+    name = string
+    rewrite_rule = list(object({
+      rule_name     = string
+      rule_sequence = number
+      condition = list(object({
+        ignore_case = bool
+        negate      = bool
+        pattern     = string
+        variable    = string
+      }))
+      request_header_configuration = list(object({
+        header_name  = string
+        header_value = string
+      }))
+      url = list(object({
+        path         = string
+        query_string = string
+        reroute      = bool
+      }))
+  })) }))
+  default = []
+}
+
 variable "ssl_policy_name" {
   description = "SSL Policy name"
   default     = "AppGwSslPolicy20170401"
