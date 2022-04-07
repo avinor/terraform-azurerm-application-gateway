@@ -13,6 +13,7 @@ func TestUT_Examples(t *testing.T) {
 		"../examples/simple",
 		"../examples/waf",
 		"../examples/rewrite-rules",
+		"../examples/rewrite-rules-response",
 		"../examples/diagnostics",
 		"../examples/diagnostics-eventhub",
 	}
