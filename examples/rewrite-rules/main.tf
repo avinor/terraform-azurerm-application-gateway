@@ -1,7 +1,7 @@
 module "rewrites" {
   source = "../../"
 
-  name                = "waf"
+  name                = "rewrite"
   resource_group_name = "appgw-rg"
   location            = "westeurope"
   subnet_id           = "/subscriptions/...."
@@ -35,7 +35,8 @@ module "rewrites" {
             header_value = "foocookie={var_cookie_foocookie}"
           }
         ]
-        url = []
+        response_header_configuration = []
+        url                           = []
       },
     ]
   }]

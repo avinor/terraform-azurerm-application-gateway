@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 2.97.0"
+      version = "~> 2.99.0"
     }
   }
 }
@@ -231,6 +231,16 @@ resource "azurerm_application_gateway" "main" {
               header_value = it3.value.header_value
             }
           }
+
+          dynamic "response_header_configuration" {
+            for_each = it.value.response_header_configuration
+            iterator = it_response_header_configuration
+            content {
+              header_name  = it_response_header_configuration.value.header_name
+              header_value = it_response_header_configuration.value.header_value
+            }
+          }
+
 
           dynamic "url" {
             for_each = it.value.url

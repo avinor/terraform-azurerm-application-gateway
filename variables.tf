@@ -117,12 +117,17 @@ variable "rewrite_rule_sets" {
         header_name  = string
         header_value = string
       }))
+      response_header_configuration = list(object({
+        header_name  = string
+        header_value = string
+      }))
       url = list(object({
         path         = string
         query_string = string
         reroute      = bool
       }))
-  })) }))
+    }))
+  }))
   default = []
 }
 
