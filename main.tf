@@ -98,6 +98,7 @@ resource "azurerm_public_ip" "main" {
   location            = azurerm_resource_group.main.location
   allocation_method   = "Static"
   sku                 = "Standard"
+  zones               = var.zones
 
   tags = var.tags
 }
