@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 2.99.0"
+      version = "~> 3.29.1"
     }
   }
 }
@@ -98,6 +98,7 @@ resource "azurerm_public_ip" "main" {
   location            = azurerm_resource_group.main.location
   allocation_method   = "Static"
   sku                 = "Standard"
+  zones               = var.zones
 
   tags = var.tags
 }
@@ -370,7 +371,7 @@ resource "azurerm_monitor_diagnostic_setting" "main" {
   storage_account_id             = local.parsed_diag.storage_account_id
 
   dynamic "log" {
-    for_each = data.azurerm_monitor_diagnostic_categories.default.logs
+    for_each = data.azurerm_monitor_diagnostic_categories.default.log_category_types
     content {
       category = log.value
       enabled  = contains(local.parsed_diag.log, "all") || contains(local.parsed_diag.log, log.value)
