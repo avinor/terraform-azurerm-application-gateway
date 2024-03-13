@@ -53,11 +53,12 @@ variable "waf_enabled" {
 variable "waf_configuration" {
   description = "Configuration block for WAF."
   type = object({
-    firewall_mode            = string
-    rule_set_type            = string
-    rule_set_version         = string
-    file_upload_limit_mb     = number
-    max_request_body_size_kb = number
+    firewall_mode                 = string
+    rule_set_type                 = string
+    rule_set_version              = string
+    file_upload_limit_mb          = number
+    max_request_body_size_kb      = number
+    request_body_inspect_limit_kb = number
   })
   default = null
 }
