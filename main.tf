@@ -293,11 +293,12 @@ resource "azurerm_web_application_firewall_policy" "main" {
   tags = var.tags
 
   policy_settings {
-    enabled                     = var.waf_enabled
-    file_upload_limit_in_mb     = coalesce(var.waf_configuration != null ? var.waf_configuration.file_upload_limit_mb : null, 100)
-    max_request_body_size_in_kb = coalesce(var.waf_configuration != null ? var.waf_configuration.max_request_body_size_kb : null, 128)
-    mode                        = coalesce(var.waf_configuration != null ? var.waf_configuration.firewall_mode : null, "Prevention")
-    request_body_check          = true
+    enabled                          = var.waf_enabled
+    file_upload_limit_in_mb          = coalesce(var.waf_configuration != null ? var.waf_configuration.file_upload_limit_mb : null, 100)
+    max_request_body_size_in_kb      = coalesce(var.waf_configuration != null ? var.waf_configuration.max_request_body_size_kb : null, 128)
+    request_body_inspect_limit_in_kb = coalesce(var.waf_configuration != null ? var.waf_configuration.request_body_inspect_limit_kb : null, 128)
+    mode                             = coalesce(var.waf_configuration != null ? var.waf_configuration.firewall_mode : null, "Prevention")
+    request_body_check               = true
   }
 
   dynamic "custom_rules" {

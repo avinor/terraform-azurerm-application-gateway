@@ -17,11 +17,12 @@ module "waf" {
 
   waf_enabled = true
   waf_configuration = {
-    firewall_mode            = "Prevention"
-    rule_set_type            = "OWASP"
-    rule_set_version         = "3.1"
-    file_upload_limit_mb     = 100
-    max_request_body_size_kb = 128
+    firewall_mode                 = "Prevention"
+    rule_set_type                 = "OWASP"
+    rule_set_version              = "3.1"
+    file_upload_limit_mb          = 100
+    max_request_body_size_kb      = 128
+    request_body_inspect_limit_kb = 128
   }
 
   managed_policies_override = [
